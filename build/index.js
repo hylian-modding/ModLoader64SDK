@@ -94,7 +94,9 @@ function init(_dir) {
         fs_extra_1.default.writeFileSync(path_1.default.resolve(_dir, "package.json"), JSON.stringify(t, null, 2));
     }
     var meta = JSON.parse(fs_extra_1.default.readFileSync(path_1.default.resolve(_dir, "package.json")).toString());
-    fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "node_modules"));
+    if (!fs_extra_1.default.existsSync(path_1.default.resolve(_dir, "node_modules"))) {
+        fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "node_modules"));
+    }
     console.log("Linking ModLoader64 API to project...");
     console.log("This might take a moment. Please be patient.");
     fs_extra_1.default.readdirSync(path_1.default.resolve(sdk, "client/node_modules")).forEach(function (dir) {

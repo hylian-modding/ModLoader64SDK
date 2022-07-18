@@ -104,7 +104,9 @@ function init(_dir: string) {
         fs.writeFileSync(path.resolve(_dir, "package.json"), JSON.stringify(t, null, 2));
     }
     let meta = JSON.parse(fs.readFileSync(path.resolve(_dir, "package.json")).toString());
-    fs.mkdirSync(path.resolve(_dir, "node_modules"));
+    if (!fs.existsSync(path.resolve(_dir, "node_modules"))) {
+        fs.mkdirSync(path.resolve(_dir, "node_modules"));
+    }
     console.log("Linking ModLoader64 API to project...");
     console.log("This might take a moment. Please be patient.");
     fs.readdirSync(path.resolve(sdk, "client/node_modules")).forEach((dir: string) => {
