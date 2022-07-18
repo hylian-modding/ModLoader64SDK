@@ -68,7 +68,7 @@ function checkGit() {
     return false;
 }
 
-function setupGulp(){
+function setupGulp() {
     if (fs.existsSync(path.resolve(og, "gulpfile.ts"))) {
         console.log(`gulp... ${checkGulp()}`);
         doBuildSingle(path.resolve(og, "gulpfile.ts"));
@@ -104,16 +104,16 @@ function init(_dir: string) {
         fs.writeFileSync(path.resolve(_dir, "package.json"), JSON.stringify(t, null, 2));
     }
     let meta = JSON.parse(fs.readFileSync(path.resolve(_dir, "package.json")).toString());
-    if (!fs.existsSync(path.resolve(_dir, "node_modules"))) {
-        fs.mkdirSync(path.resolve(_dir, "node_modules"));
-        console.log("Linking ModLoader64 API to project...");
-        console.log("This might take a moment. Please be patient.");
-        fs.readdirSync(path.resolve(sdk, "client/node_modules")).forEach((dir: string) => {
-            let d = path.resolve(sdk, "client/node_modules", dir);
-            let d1 = path.resolve(_dir, "node_modules", path.parse(d).base);
+    fs.mkdirSync(path.resolve(_dir, "node_modules"));
+    console.log("Linking ModLoader64 API to project...");
+    console.log("This might take a moment. Please be patient.");
+    fs.readdirSync(path.resolve(sdk, "client/node_modules")).forEach((dir: string) => {
+        let d = path.resolve(sdk, "client/node_modules", dir);
+        let d1 = path.resolve(_dir, "node_modules", path.parse(d).base);
+        if (!fs.existsSync(d1)) {
             makeSymlink(d, d1);
-        });
-    }
+        }
+    });
     if (!fs.existsSync(path.resolve(_dir, "src"))) {
         fs.mkdirSync(path.resolve(_dir, "src"));
         fs.mkdirSync(path.resolve(_dir, "src", meta.name));

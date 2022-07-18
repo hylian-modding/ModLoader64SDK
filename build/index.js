@@ -94,16 +94,16 @@ function init(_dir) {
         fs_extra_1.default.writeFileSync(path_1.default.resolve(_dir, "package.json"), JSON.stringify(t, null, 2));
     }
     var meta = JSON.parse(fs_extra_1.default.readFileSync(path_1.default.resolve(_dir, "package.json")).toString());
-    if (!fs_extra_1.default.existsSync(path_1.default.resolve(_dir, "node_modules"))) {
-        fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "node_modules"));
-        console.log("Linking ModLoader64 API to project...");
-        console.log("This might take a moment. Please be patient.");
-        fs_extra_1.default.readdirSync(path_1.default.resolve(sdk, "client/node_modules")).forEach(function (dir) {
-            var d = path_1.default.resolve(sdk, "client/node_modules", dir);
-            var d1 = path_1.default.resolve(_dir, "node_modules", path_1.default.parse(d).base);
+    fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "node_modules"));
+    console.log("Linking ModLoader64 API to project...");
+    console.log("This might take a moment. Please be patient.");
+    fs_extra_1.default.readdirSync(path_1.default.resolve(sdk, "client/node_modules")).forEach(function (dir) {
+        var d = path_1.default.resolve(sdk, "client/node_modules", dir);
+        var d1 = path_1.default.resolve(_dir, "node_modules", path_1.default.parse(d).base);
+        if (!fs_extra_1.default.existsSync(d1)) {
             makeSymlink(d, d1);
-        });
-    }
+        }
+    });
     if (!fs_extra_1.default.existsSync(path_1.default.resolve(_dir, "src"))) {
         fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "src"));
         fs_extra_1.default.mkdirSync(path_1.default.resolve(_dir, "src", meta.name));
