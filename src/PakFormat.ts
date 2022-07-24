@@ -5,7 +5,7 @@ let fx = require('mkdir-recursive');
 import crypto from 'crypto';
 import os from 'os';
 
-function slash(path: string) {
+export function slash(path: string) {
 	const isExtendedLengthPath = /^\\\\\?\\/.test(path);
 	const hasNonAscii = /[^\u0000-\u0080]+/.test(path); // eslint-disable-line no-control-regex
 

@@ -1,0 +1,36 @@
+{
+  "name": "paker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../modloader64 -cb",
+    "copy": "run-script-os",
+    "copy:test:win32": "cp ./paker-win.exe ../../paker.exe",
+    "copy:nix": "chmod +x ./paker-linux && cp ./paker-linux ../../paker",
+    "dist": "cp ./paker-win.exe ../../dist/windows/paker.exe && cp ./paker-linux ../../dist/linux/paker",
+    "pkg": "pkg --compress GZip . && yarn copy",
+    "postinstall": "yarn build && yarn pkg"
+  },
+  "bin": {
+    "paker": "./build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "../../node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node16-win-x64",
+      "node16-linux-x64"
+    ],
+    "outputPath": "."
+  },
+  "dependencies": {
+    "mkdir-recursive": "^0.4.0",
+    "recursive-readdir": "^2.2.2"
+  }
+}

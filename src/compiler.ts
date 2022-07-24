@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import { getAllFiles } from "./getAllFiles";
 import fs from 'fs-extra';
 import path from 'path';
+import { slash } from "./PakFormat";
 
 function compile(fileNames: string[], options: ts.CompilerOptions): void {
     let program = ts.createProgram(fileNames, options);
@@ -24,7 +25,7 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
 
 function getAllFilesNoModules(dir: string, files: Array<string>, ext: string){
     getAllFiles(dir, files, ext);
-    let r = [];
+    let r: string[] = [];
     for (let i = 0; i < files.length; i++){
         if (files[i].indexOf("node_modules") > -1){
             r.push(files[i]);
@@ -48,11 +49,11 @@ export function doBuild(dir: string) {
         fs.mkdirSync(build);
     }
     let map: Record<string, string[]> = {};
-    map[`@${meta.name}/*`] = [path.resolve(src, meta.name) + "/*"];
+    map[`@${meta.name}/*`] = ["./" + slash(path.relative(dir, path.resolve(src, meta.name))) + "/*"];
     compile(getAllFilesNoModules(src, [], ".ts"), {
         noEmitOnError: true,
         noImplicitAny: false,
-        target: ts.ScriptTarget.ES5,
+        target: ts.ScriptTarget.ESNext,
         module: ts.ModuleKind.CommonJS,
         experimentalDecorators: true,
         outDir: build,
@@ -66,11 +67,12 @@ export function doBuild(dir: string) {
     let core = path.resolve(dir, "cores");
     if (fs.existsSync(core)) {
         let map: Record<string, string[]> = {};
-        map[`@${meta.name}/*`] = [path.resolve(src, meta.name) + "/*"];
+        map[`@${meta.name}/*`] = ["./" + slash(path.relative(dir, path.resolve(core, meta.name))) + "/*"];
+        console.log(map);
         compile(getAllFilesNoModules(core, [], ".ts"), {
             noEmitOnError: true,
             noImplicitAny: false,
-            target: ts.ScriptTarget.ES5,
+            target: ts.ScriptTarget.ESNext,
             module: ts.ModuleKind.CommonJS,
             experimentalDecorators: true,
             outDir: build,
@@ -90,13 +92,14 @@ export function doBuildSingle(f: string) {
     compile([f], {
         noEmitOnError: true,
         noImplicitAny: false,
-        target: ts.ScriptTarget.ES5,
+        target: ts.ScriptTarget.ESNext,
         module: ts.ModuleKind.CommonJS,
         experimentalDecorators: true,
         outDir: build,
         rootDir: src,
         esModuleInterop: true
     });
+    return path.resolve(path.parse(f).dir, `${path.parse(f).name}.js`);
 }
 
 export function doCopy(dir: string) {

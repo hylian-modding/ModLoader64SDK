@@ -1,0 +1,35 @@
+{
+  "name": "bintots",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../modloader64 -cb",
+    "copy": "run-script-os",
+    "copy:test:win32": "cp ./bintots-win.exe ../../bintots.exe",
+    "copy:nix": "chmod +x ./bintots-linux && cp ./bintots-linux ../../bintots",
+    "dist": "cp ./bintots-win.exe ../../dist/windows/bintots.exe && cp ./bintots-linux ../../dist/linux/bintots",
+    "pkg": "pkg --compress GZip . && yarn copy",
+    "postinstall": "yarn build && yarn pkg"
+  },
+  "bin": {
+    "bintots": "./build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "../../node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node16-win-x64",
+      "node16-linux-x64"
+    ],
+    "outputPath": "."
+  },
+  "dependencies": {
+    "recursive-readdir": "^2.2.2"
+  }
+}

@@ -102,3 +102,26 @@ dist
 
 # TernJS port file
 .tern-port
+
+build/
+client/
+bintots.exe
+.vscode/settings.json
+dist.js
+linker.exe
+modloader64.exe
+modloader64
+SDK-Config.json
+paker.exe
+prebuild.js
+updateml.js
+src/linux.md5
+src/linux.zip
+src/windows.md5
+src/windows.zip
+tools/bintots/bintots-linux
+tools/bintots/bintots-win.exe
+tools/linker/linker-linux
+tools/linker/linker-win.exe
+tools/paker/paker-win.exe
+tools/paker/paker-linux

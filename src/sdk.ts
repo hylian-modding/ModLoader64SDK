@@ -1,24 +1,55 @@
-const { register, addAsarToLookupPaths } = require('asar-node');
 import { program } from 'commander';
 import asar from 'asar';
 import fs from 'fs-extra';
 import path from 'path';
 import { doBuild, doBuildSingle, doCopy } from './compiler';
 import { template } from './template';
-import child_process from 'child_process';
+import child_process, { ChildProcess } from 'child_process';
 import { getAllFiles, getAllFolders } from './getAllFiles';
 import AdmZip from 'adm-zip';
 import { Pak } from './PakFormat';
+import { clientcfgtemplate, clientcfgtemplate_nonhost } from './clientcfgtemplate';
+import { ISDKConfig, SDKConfig } from './config';
+import os from 'os';
 
-register();
-addAsarToLookupPaths();
+const arch: string = os.arch();
+const platform: string = os.platform();
+const oskey: string = `${platform}${arch}`;
+
+class MLInstance {
+    inst: ChildProcess;
+
+    constructor(inst: ChildProcess) {
+        this.inst = inst;
+    }
+}
+const ML_INSTANCES: MLInstance[] = [];
+
+function exitHandler() {
+    var kill = require('tree-kill');
+    ML_INSTANCES.forEach((inst: MLInstance) => {
+        kill(inst.inst.pid, () => { });
+    });
+}
+
+process.on('exit', exitHandler);
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler);
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler);
+process.on('SIGUSR2', exitHandler);
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler);
 
 program.option('-n, --init', 'init new project');
 program.option("-c, --clean", "cleans build dirs");
 program.option('-b, --build', 'build mod');
 program.option('-d, --dist', 'pack mod');
 program.option(`-i, --install <url>`, 'install core');
-program.option('-r, --run', 'run mod');
+program.option('-r, --run <num>', 'run mod');
 
 program.allowUnknownOption(true);
 program.parse(process.argv);
@@ -35,28 +66,20 @@ interface Opts {
 }
 
 class Tools {
-    static gulp: boolean = false;
     static git: boolean = false;
 }
 
 let og: string = path.resolve(process.cwd());
 let sdk: string = path.resolve(path.parse(process.execPath).dir);
-if (fs.existsSync(path.resolve(sdk, "node.exe"))) {
-    // Probably a weird setup?
-    sdk = path.resolve(__dirname, "..");
+
+let config: ISDKConfig = new SDKConfig(path.resolve(sdk, "roms"));
+let config_file: string = path.resolve(sdk, "SDK-Config.json");
+if (!fs.existsSync(config_file)) {
+    fs.writeFileSync(config_file, JSON.stringify(config, null, 2));
 }
+config = JSON.parse(fs.readFileSync(config_file).toString());
 
 const options: Opts = program.opts();
-
-function checkGulp() {
-    try {
-        child_process.execSync("gulp -v", { stdio: 'pipe' })
-        Tools.gulp = true;
-        return true;
-    } catch (err) {
-    }
-    return false;
-}
 
 function checkGit() {
     try {
@@ -66,13 +89,6 @@ function checkGit() {
     } catch (err) {
     }
     return false;
-}
-
-function setupGulp() {
-    if (fs.existsSync(path.resolve(og, "gulpfile.ts"))) {
-        console.log(`gulp... ${checkGulp()}`);
-        doBuildSingle(path.resolve(og, "gulpfile.ts"));
-    }
 }
 
 function makeSymlink(src: string, dest: string) {
@@ -88,14 +104,46 @@ function makeSymlink(src: string, dest: string) {
 }
 
 try {
-    if (!fs.existsSync(path.resolve(sdk, "client"))) {
-        console.log("Extracting client...");
-        asar.extractAll(path.resolve(sdk, "client.asar"), path.resolve(sdk, "client"));
-        if (!fs.existsSync(path.resolve(sdk, "client/node_modules"))) {
-            asar.extractAll(path.resolve(sdk, "client/node_modules.asar"), path.resolve(sdk, "client", "node_modules"));
+    let n: string = "windows";
+    if (oskey === "linuxx64"){
+        n = "linux";
+    }
+    let md5: Buffer = Buffer.from("DEADBEEF", 'hex');
+    if (fs.existsSync(path.join(__dirname, `${n}.md5`))) {
+        md5 = fs.readFileSync(path.join(__dirname, `${n}.md5`));
+    }
+    let client_folder = path.resolve(sdk, "client");
+    let backups: Map<string, Buffer> = new Map();
+    let mupen_config: string = path.resolve(client_folder, "emulator", "mupen64plus.cfg");
+    let overwrite: boolean = false;
+    if (fs.existsSync(client_folder)) {
+        let hash = Buffer.from("DEADBEEF", 'hex');
+        if (fs.existsSync(path.resolve(client_folder, "client.md5"))) {
+            hash = fs.readFileSync(path.resolve(client_folder, "client.md5"));
+        }
+        if (!md5.equals(hash)) {
+            backups.set(mupen_config, fs.readFileSync(mupen_config));
+            overwrite = true;
         }
     }
-} catch (err) { }
+    if (!fs.existsSync(client_folder) || overwrite) {
+        console.log("Extracting client...");
+        let z = fs.readFileSync(path.join(__dirname, `${n}.zip`));
+        let zip = new AdmZip(z);
+        zip.extractAllTo(path.resolve(sdk));
+        asar.extractAll(path.resolve(sdk, `${n}.asar`), client_folder);
+        fs.removeSync(path.resolve(sdk, `${n}.asar`));
+        asar.extractAll(path.resolve(sdk, "client/node_modules.asar"), path.resolve(sdk, "client", "node_modules"));
+        fs.removeSync(path.resolve(sdk, "client/node_modules.asar"));
+        fs.writeFileSync(path.resolve(client_folder, "client.md5"), md5);
+        backups.forEach((value: Buffer, key: string) => {
+            fs.writeFileSync(key, value);
+        });
+        fs.copyFileSync(process.execPath, path.resolve(client_folder, path.parse(process.execPath).base));
+    }
+} catch (err) {
+    if (err) console.error(err);
+}
 
 function init(_dir: string) {
     if (!fs.existsSync(path.resolve(_dir, "package.json"))) {
@@ -121,14 +169,15 @@ function init(_dir: string) {
         fs.mkdirSync(path.resolve(_dir, "src", meta.name));
         fs.copyFileSync(path.resolve(_dir, "package.json"), path.resolve(_dir, "src", meta.name, "package.json"));
     }
-    setupGulp();
 }
 
 function checkSymLinks() {
     let fail: boolean = false;
     let nm = path.resolve(og, "node_modules");
+    if (!fs.existsSync(nm)) return;
     fs.readdirSync(nm).forEach((dir: string) => {
-        if (!fs.existsSync(path.resolve(nm, dir))) {
+        if (!fs.existsSync(path.resolve(nm, dir)) && dir !== ".yarn-integrity") {
+            console.log(dir);
             if (!fail) fail = true;
         }
     });
@@ -141,14 +190,32 @@ function checkSymLinks() {
 
 function build() {
     checkSymLinks();
+    let meta: any = JSON.parse(fs.readFileSync(path.resolve(og, "package.json")).toString());
     console.log(`Building ${og}...`);
-    setupGulp();
-    if (Tools.gulp) {
-        child_process.execSync("gulp", { stdio: "inherit" });
-    } else {
-        doBuild(og);
+    if (meta.hasOwnProperty("scripts")) {
+        if (meta.scripts.hasOwnProperty("MLPreBuildScript")) {
+            let s = meta.scripts.MLPreBuildScript;
+            if (path.parse(s).ext === ".ts") {
+                s = doBuildSingle(path.resolve(og, s));
+            } else {
+                s = path.resolve(og, s);
+            }
+            child_process.fork(s, { stdio: 'inherit' });
+        }
     }
+    doBuild(og);
     doCopy(og);
+    if (meta.hasOwnProperty("scripts")) {
+        if (meta.scripts.hasOwnProperty("MLBuildScript")) {
+            let s = meta.scripts.MLBuildScript;
+            if (path.parse(s).ext === ".ts") {
+                s = doBuildSingle(path.resolve(og, s));
+            } else {
+                s = path.resolve(og, s);
+            }
+            child_process.fork(s, { stdio: 'inherit' });
+        }
+    }
 }
 
 function clean() {
@@ -226,8 +293,25 @@ function install() {
     }
 }
 
-function run() {
+const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}"`, `--cores "${path.resolve(sdk, "client", "cores")}"`, `--mods "${path.resolve(og, "build")}"`];
 
+function run(numOfInstances: number) {
+    for (let i = 0; i < numOfInstances; i++) {
+        if (i > 0) {
+            fs.writeFileSync(path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
+        } else {
+            fs.writeFileSync(path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
+        }
+        setTimeout(() => {
+            let args: string[] = [];
+            for (let i = 0; i < ML_ARGS.length; i++) {
+                args.push(ML_ARGS[i]);
+            }
+            args.push(`--config "${path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`)}"`);
+            console.log(`Starting client with args: ${process.execPath} ${args.join(" ")}`);
+            ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, detached: true, cwd: path.resolve(sdk, "client") })));
+        }, i * 1000);
+    }
 }
 
 if (options.init !== undefined) {
@@ -246,5 +330,5 @@ if (options.dist !== undefined) {
     dist();
 }
 if (options.run !== undefined) {
-    run();
+    run(parseInt(options.run.toString()));
 }
