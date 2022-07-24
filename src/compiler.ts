@@ -23,16 +23,16 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
     });
 }
 
-function getAllFilesNoModules(dir: string, files: Array<string>, ext: string){
+function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
     getAllFiles(dir, files, ext);
     let r: string[] = [];
-    for (let i = 0; i < files.length; i++){
-        if (files[i].indexOf("node_modules") > -1){
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].indexOf("node_modules") > -1) {
             r.push(files[i]);
         }
     }
-    if (r.length > 0){
-        while (r.length > 0){
+    if (r.length > 0) {
+        while (r.length > 0) {
             let rm = r.shift()!;
             let index = files.indexOf(rm);
             files.splice(index, 1);
@@ -110,4 +110,24 @@ export function doCopy(dir: string) {
     if (fs.existsSync(core)) {
         fs.copySync(core, build, { recursive: true });
     }
+}
+
+export class SDKCompiler {
+    doBuild(dir: string) {
+        doBuild(dir);
+    }
+
+    doBuildSingle(f: string): string {
+        return doBuildSingle(f);
+    }
+
+    doCopy(dir: string) {
+        doCopy(dir);
+    }
+}
+
+export interface ISDKCompiler{
+    doBuild(dir: string);
+    doBuildSingle(f: string): string;
+    doCopy(dir: string);
 }

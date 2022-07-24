@@ -2,7 +2,7 @@ import { program } from 'commander';
 import asar from 'asar';
 import fs from 'fs-extra';
 import path from 'path';
-import { doBuild, doBuildSingle, doCopy } from './compiler';
+import { doBuild, doBuildSingle, doCopy, SDKCompiler } from './compiler';
 import { template } from './template';
 import child_process, { ChildProcess } from 'child_process';
 import { getAllFiles, getAllFolders } from './getAllFiles';
@@ -11,6 +11,7 @@ import { Pak } from './PakFormat';
 import { clientcfgtemplate, clientcfgtemplate_nonhost } from './clientcfgtemplate';
 import { ISDKConfig, SDKConfig } from './config';
 import os from 'os';
+import PluginManager from './plugins';
 
 const arch: string = os.arch();
 const platform: string = os.platform();
@@ -72,6 +73,8 @@ class Tools {
 let og: string = path.resolve(process.cwd());
 let sdk: string = path.resolve(path.parse(process.execPath).dir);
 
+const plugins = new PluginManager(sdk);
+
 let config: ISDKConfig = new SDKConfig(path.resolve(sdk, "roms"));
 let config_file: string = path.resolve(sdk, "SDK-Config.json");
 if (!fs.existsSync(config_file)) {
@@ -105,7 +108,7 @@ function makeSymlink(src: string, dest: string) {
 
 try {
     let n: string = "windows";
-    if (oskey === "linuxx64"){
+    if (oskey === "linuxx64") {
         n = "linux";
     }
     let md5: Buffer = Buffer.from("DEADBEEF", 'hex');
@@ -315,7 +318,13 @@ function run(numOfInstances: number) {
 }
 
 if (options.init !== undefined) {
-    init(og);
+    let ctx = () => { init(og); };
+    if (plugins.plugins.length > 0) {
+        for (let i = 0; i < plugins.plugins.length; i++) {
+            ctx = plugins.plugins[i].init(og, sdk, ctx);
+        }
+    }
+    ctx();
 }
 if (options.install !== undefined) {
     install();
@@ -324,10 +333,23 @@ if (options.clean !== undefined) {
     clean();
 }
 if (options.build !== undefined) {
-    build();
+    let comp = new SDKCompiler();
+    let ctx = () => { build(); };
+    if (plugins.plugins.length > 0) {
+        for (let i = 0; i < plugins.plugins.length; i++) {
+            ctx = plugins.plugins[i].build(og, sdk, ctx, comp);
+        }
+    }
+    ctx();
 }
 if (options.dist !== undefined) {
-    dist();
+    let ctx = () => { dist(); };
+    if (plugins.plugins.length > 0) {
+        for (let i = 0; i < plugins.plugins.length; i++) {
+            ctx = plugins.plugins[i].dist(og, sdk, ctx);
+        }
+    }
+    ctx();
 }
 if (options.run !== undefined) {
     run(parseInt(options.run.toString()));

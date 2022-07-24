@@ -1,0 +1,13 @@
+{
+  "name": "AsarPlugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "AsarPlugin.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {},
+  "core": "*"
+}

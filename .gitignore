@@ -125,3 +125,7 @@ tools/linker/linker-linux
 tools/linker/linker-win.exe
 tools/paker/paker-win.exe
 tools/paker/paker-linux
+plugins/
+subprojects/GulpPlugin/gulpfile.js
+modloader64-linux
+modloader64-win.exe
