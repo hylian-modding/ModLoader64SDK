@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "_build": "npx tsc",
-    "_build2": "modloader64 -cb && yarn pkg && yarn copy",
+    "_build2": "./modloader64 -cb && yarn pkg && yarn copy",
     "copy": "run-script-os",
     "copy:test:win32": "cp ./modloader64-win.exe ./modloader64.exe && cp ./modloader64.exe ./ModLoader/modloader64.exe",
     "copy:nix": "cp ./modloader64-linux ./modloader64 && chmod +x ./modloader64 && cp ./modloader64 ./ModLoader64/modloader64",
@@ -15,7 +15,7 @@
     "paker": "cd ./tools/paker && yarn",
     "bintots": "cd ./tools/bintots && yarn",
     "linker": "cd ./tools/linker && yarn",
-    "tools": "yarn paker && yarn bintots && yarn linker",
+    "tools": "yarn paker",
     "update_core": "ts-node ./updateml.ts",
     "MLPreBuildScript": "./prebuild.ts"
   },
