@@ -1,13 +1,21 @@
 import child_process from 'child_process';
 import fs from 'fs';
 
+function build(){
+    try{
+        console.log(child_process.execSync("modloader64 -cb").toString());
+    }catch(err){
+        console.log(child_process.execSync("./modloader64 -cb").toString());
+    }
+}
+
 let og = process.cwd();
 process.chdir("./ModLoader64");
 child_process.execSync("yarn");
 process.chdir("./API");
-console.log(child_process.execSync("modloader64 -cb").toString());
+build();
 process.chdir("../");
-console.log(child_process.execSync("modloader64 -cb").toString());
+build();
 process.chdir(og);
 
 fs.copyFileSync("./ModLoader64/windows.zip", "./src/windows.zip");
