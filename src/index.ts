@@ -6,6 +6,8 @@ import { argv } from 'process';
 register();
 addAsarToLookupPaths();
 
+global["MLASARSUPPORT"] = true;
+
 let og: string = path.resolve(process.cwd());
 
 if (fs.existsSync(path.resolve(og, "client.md5")) || argv.indexOf("--forceclientmode") > -1) {

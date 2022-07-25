@@ -24,6 +24,8 @@ class MLInstance {
         this.inst = inst;
     }
 }
+
+const ML_CORES: Map<string, string> = new Map();
 const ML_INSTANCES: MLInstance[] = [];
 
 function exitHandler() {
@@ -82,6 +84,17 @@ if (!fs.existsSync(config_file)) {
 }
 config = JSON.parse(fs.readFileSync(config_file).toString());
 
+if (fs.existsSync(path.resolve(sdk, "_cores"))) {
+    fs.readdirSync(path.resolve(sdk, "_cores")).forEach((f: string) => {
+        let dir = path.resolve(sdk, "_cores", f);
+        if (fs.lstatSync(dir).isDirectory() || fs.lstatSync(dir).isSymbolicLink()) {
+            let meta = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
+            ML_CORES.set(meta.name, dir);
+            console.log(`Detected installed core: ${meta.name}`);
+        }
+    });
+}
+
 const options: Opts = program.opts();
 
 function checkGit() {
@@ -102,7 +115,7 @@ function makeSymlink(src: string, dest: string) {
         }
         fs.symlinkSync(src, dest, 'junction');
     } catch (err) {
-        console.log(err);
+        //console.log(err);
     }
 }
 
@@ -166,6 +179,9 @@ function init(_dir: string) {
         if (!fs.existsSync(d1)) {
             makeSymlink(d, d1);
         }
+    });
+    ML_CORES.forEach((value: string, key: string) => {
+        install(true, value);
     });
     if (!fs.existsSync(path.resolve(_dir, "src"))) {
         fs.mkdirSync(path.resolve(_dir, "src"));
@@ -258,30 +274,31 @@ function dist() {
     });
 }
 
-function install() {
+function install(skipClone: boolean = false, url: string = "") {
     console.log(`git.... ${checkGit()}`);
     let c = path.resolve(sdk, "_cores");
     if (!fs.existsSync(c)) {
         fs.mkdirSync(c);
     }
-    let url = options.install!.toString();
+    if (url === "") url = options.install!.toString();
     if (!Tools.git) {
         console.error("You do not have git installed!");
         throw new Error("You do not have git installed!");
     } else {
         let name = path.parse(url).name;
         let dir = path.resolve(c, name);
-        if (!fs.existsSync(dir)) {
+        if (!fs.existsSync(dir) && !skipClone) {
             child_process.execSync(`git clone --recurse-submodules ${url} ${dir}`);
         }
         let meta = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
         if (meta.name !== name) {
             name = meta.name;
         }
-        console.log(dir);
-        init(dir);
-        doBuild(dir);
-        doCopy(dir);
+        if (!skipClone) {
+            init(dir);
+            doBuild(dir);
+            doCopy(dir);
+        }
         let folders = getAllFolders(path.resolve(dir, "build"), []);
         while (folders.length > 1) {
             folders.pop();

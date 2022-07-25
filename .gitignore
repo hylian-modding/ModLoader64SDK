@@ -129,3 +129,7 @@ plugins/
 subprojects/GulpPlugin/gulpfile.js
 modloader64-linux
 modloader64-win.exe
+projects/
+_cores/
+tools/modrecompiler/modrecompiler-linux
+tools/modrecompiler/modrecompiler-win.exe

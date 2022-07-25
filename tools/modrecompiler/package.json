@@ -1,0 +1,34 @@
+{
+  "name": "modrecompiler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../modloader64 -cb",
+    "copy": "run-script-os",
+    "copy:test:win32": "cp ./modrecompiler-win.exe ../../modrecompiler.exe",
+    "copy:nix": "chmod +x ./modrecompiler-linux && cp ./modrecompiler-linux ../../modrecompiler",
+    "dist": "cp ./modrecompiler-win.exe ../../dist/windows/modrecompiler.exe && cp ./modrecompiler-linux ../../dist/linux/modrecompiler",
+    "pkg": "pkg --compress GZip . && yarn copy",
+    "postinstall": "yarn build && yarn pkg"
+  },
+  "bin": {
+    "modrecompiler": "./build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "../../node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node16-win-x64",
+      "node16-linux-x64"
+    ],
+    "outputPath": "."
+  },
+  "dependencies": {
+  }
+}

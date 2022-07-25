@@ -7,7 +7,7 @@
     "_build": "npx tsc",
     "_build2": "./modloader64 -cb && yarn pkg && yarn copy",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./modloader64-win.exe ./modloader64.exe && cp ./modloader64.exe ./ModLoader/modloader64.exe",
+    "copy:test:win32": "cp ./modloader64-win.exe ./modloader64.exe && cp ./modloader64.exe ./ModLoader64/modloader64.exe",
     "copy:nix": "cp ./modloader64-linux ./modloader64 && chmod +x ./modloader64 && cp ./modloader64 ./ModLoader64/modloader64",
     "dist": "mv ./modloader64-win.exe ./dist/windows/modloader64.exe && mv ./modloader64-linux ./dist/linux/modloader64 && ts-node ./dist.ts",
     "pkg": "pkg --compress GZip .",
@@ -15,6 +15,7 @@
     "paker": "cd ./tools/paker && yarn",
     "bintots": "cd ./tools/bintots && yarn",
     "linker": "cd ./tools/linker && yarn",
+    "recompiler": "cd ./tools/modrecompiler && yarn",
     "tools": "yarn paker",
     "update_core": "ts-node ./updateml.ts",
     "MLPreBuildScript": "./prebuild.ts"
