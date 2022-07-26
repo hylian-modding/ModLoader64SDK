@@ -1,18 +1,9 @@
 import child_process from 'child_process';
 import fs from 'fs';
 
-function build(){
-    console.log(child_process.execSync("npx tsc").toString());
-    child_process.execSync("ts-node ./build.ts");
-}
-
 let og = process.cwd();
 process.chdir("./ModLoader64");
 child_process.execSync("yarn");
-process.chdir("./API");
-build();
-process.chdir("../");
-build();
 process.chdir(og);
 
 fs.copyFileSync("./ModLoader64/windows.zip", "./src/windows.zip");
