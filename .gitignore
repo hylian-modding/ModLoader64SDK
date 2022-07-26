@@ -136,3 +136,4 @@ tools/modrecompiler/modrecompiler-win.exe
 tinytsc.exe
 tools/tinytsc/tinytsc-win.exe
 tools/tinytsc/tinytsc-linux
+modrecompiler.exe

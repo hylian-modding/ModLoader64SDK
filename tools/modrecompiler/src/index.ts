@@ -33,7 +33,8 @@ if (opts.input !== undefined) {
     child_process.execSync(`paker -i "${path.resolve(opts.input!)}" -o "${src}"`, { stdio: 'inherit' });
     let files = getAllFiles(src, []);
     files.forEach((file: string) => {
-        if (file.indexOf(".d.ts") > -1 || file.indexOf(".map") > -1 || file.indexOf(".js") > -1) {
+        if (file.indexOf(".d.ts") > -1 || file.indexOf(".map") > -1 || path.parse(file).ext === ".js") {
+            console.log(file);
             fs.unlinkSync(file);
         }
     });
