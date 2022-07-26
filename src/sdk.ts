@@ -158,7 +158,7 @@ try {
         fs.copyFileSync(process.execPath, path.resolve(client_folder, path.parse(process.execPath).base));
     }
 } catch (err) {
-    if (err) console.error(err);
+    //if (err) console.error(err);
 }
 
 function init(_dir: string) {

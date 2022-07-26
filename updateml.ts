@@ -2,11 +2,8 @@ import child_process from 'child_process';
 import fs from 'fs';
 
 function build(){
-    try{
-        console.log(child_process.execSync("modloader64 -cb").toString());
-    }catch(err){
-        console.log(child_process.execSync("./modloader64 -cb").toString());
-    }
+    console.log(child_process.execSync("npx tsc").toString());
+    child_process.execSync("ts-node ./build.ts");
 }
 
 let og = process.cwd();
