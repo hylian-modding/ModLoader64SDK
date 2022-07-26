@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "../../modloader64 -cb",
+    "build": "../../tinytsc",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./paker-win.exe ../../paker.exe && cp ./paker-win.exe ../../ModLoader64/paker.exe",
+    "copy:test:win32": "cp ./paker-win.exe ../../paker.exe",
     "copy:nix": "chmod +x ./paker-linux && cp ./paker-linux ../../paker && cp ./paker-linux ../../ModLoader64/paker",
     "dist": "cp ./paker-win.exe ../../dist/windows/paker.exe && cp ./paker-linux ../../dist/linux/paker",
     "pkg": "pkg --compress GZip . && yarn copy",

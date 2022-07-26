@@ -1,19 +1,19 @@
 {
-  "name": "modrecompiler",
+  "name": "tinytsc",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "../../tinytsc",
+    "build": "npx tsc",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./modrecompiler-win.exe ../../modrecompiler.exe",
-    "copy:nix": "chmod +x ./modrecompiler-linux && cp ./modrecompiler-linux ../../modrecompiler",
-    "dist": "cp ./modrecompiler-win.exe ../../dist/windows/modrecompiler.exe && cp ./modrecompiler-linux ../../dist/linux/modrecompiler",
+    "copy:test:win32": "cp ./tinytsc-win.exe ../../tinytsc.exe",
+    "copy:nix": "chmod +x ./tinytsc-linux && cp ./tinytsc-linux ../../tinytsc",
+    "dist": "cp ./tinytsc-win.exe ../../dist/windows/tinytsc.exe && cp ./tinytsc-linux ../../dist/linux/tinytsc",
     "pkg": "pkg --compress GZip . && yarn copy",
     "postinstall": "yarn build && yarn pkg"
   },
   "bin": {
-    "modrecompiler": "./build/index.js"
+    "tinytsc": "./build/index.js"
   },
   "author": "",
   "license": "ISC",

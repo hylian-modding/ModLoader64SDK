@@ -133,3 +133,6 @@ projects/
 _cores/
 tools/modrecompiler/modrecompiler-linux
 tools/modrecompiler/modrecompiler-win.exe
+tinytsc.exe
+tools/tinytsc/tinytsc-win.exe
+tools/tinytsc/tinytsc-linux

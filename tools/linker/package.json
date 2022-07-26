@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "../../modloader64 -cb",
+    "build": "../../tinytsc",
     "copy": "run-script-os",
     "copy:test:win32": "cp ./linker-win.exe ../../linker.exe",
     "copy:nix": "chmod +x ./linker-linux && cp ./linker-linux ../../linker",

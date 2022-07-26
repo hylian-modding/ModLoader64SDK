@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "../../modloader64 -cb",
+    "build": "../../tinytsc",
     "copy": "run-script-os",
     "copy:test:win32": "cp ./bintots-win.exe ../../bintots.exe",
     "copy:nix": "chmod +x ./bintots-linux && cp ./bintots-linux ../../bintots",
