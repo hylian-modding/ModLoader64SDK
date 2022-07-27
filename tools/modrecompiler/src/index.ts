@@ -19,18 +19,26 @@ interface Opts {
     input?: string;
 }
 
+const gl = `declare namespace NodeJS {
+    export interface Global {
+      ModLoader: any
+    }
+  }`;
+
 const opts: Opts = program.opts();
 
 if (opts.input !== undefined) {
     let name = path.parse(opts.input!).name;
     let og = process.cwd();
     let proj = path.resolve(".", name);
-    fs.mkdirSync(proj);
-    process.chdir(proj);
-    child_process.execSync("modloader64 -n", { stdio: 'inherit' });
-    process.chdir(og);
     let src = path.resolve(proj, "src");
-    child_process.execSync(`paker -i "${path.resolve(opts.input!)}" -o "${src}"`, { stdio: 'inherit' });
+    if (!fs.existsSync(proj)) {
+        fs.mkdirSync(proj);
+        process.chdir(proj);
+        child_process.execSync("modloader64 -n", { stdio: 'inherit' });
+        process.chdir(og);
+        child_process.execSync(`paker -i "${path.resolve(opts.input!)}" -o "${src}"`, { stdio: 'inherit' });
+    }
     let files = getAllFiles(src, []);
     files.forEach((file: string) => {
         if (file.indexOf(".d.ts") > -1 || file.indexOf(".map") > -1 || path.parse(file).ext === ".js") {
@@ -39,5 +47,6 @@ if (opts.input !== undefined) {
         }
     });
     process.chdir(proj);
+    fs.writeFileSync("./src/global.d.ts", Buffer.from(gl));
     child_process.execSync('modloader64 -cbd', { stdio: 'inherit' });
 }
