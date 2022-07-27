@@ -1,0 +1,35 @@
+{
+  "name": "updater",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../tinytsc",
+    "copy": "run-script-os",
+    "copy:test:win32": "cp ./updater-win.exe ../../updater.exe",
+    "copy:nix": "chmod +x ./updater-linux && cp ./updater-linux ../../updater",
+    "dist": "cp ./updater-win.exe ../../dist/windows/updater.exe && cp ./updater-linux ../../dist/linux/updater",
+    "pkg": "pkg --compress GZip . && yarn copy",
+    "postinstall": "yarn build && yarn pkg && yarn dist"
+  },
+  "bin": {
+    "updater": "./build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "../../node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node16-win-x64",
+      "node16-linux-x64"
+    ],
+    "outputPath": "."
+  },
+  "dependencies": {
+    "download-file": "^0.1.5"
+  }
+}

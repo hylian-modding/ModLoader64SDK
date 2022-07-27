@@ -137,3 +137,6 @@ tinytsc.exe
 tools/tinytsc/tinytsc-win.exe
 tools/tinytsc/tinytsc-linux
 modrecompiler.exe
+tools/updater/updater-linux
+tools/updater/updater-win.exe
+updater.exe
