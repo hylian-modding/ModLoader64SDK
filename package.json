@@ -16,7 +16,7 @@
     "recompiler": "cd ./tools/modrecompiler && yarn",
     "tinytsc": "cd ./tools/tinytsc && yarn",
     "updater": "cd ./tools/updater && yarn",
-    "tools": "yarn tinytsc && yarn paker",
+    "tools": "yarn tinytsc",
     "update_core": "ts-node ./updateml.ts",
     "fullbuild": "yarn && yarn tools && yarn update_core && yarn build && yarn dist",
     "docker": "yarn fullbuild && cp -R ./dist /output",
