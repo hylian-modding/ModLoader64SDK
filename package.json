@@ -19,6 +19,7 @@
     "tools": "yarn tinytsc && yarn paker",
     "update_core": "ts-node ./updateml.ts",
     "fullbuild": "yarn && yarn tools && yarn update_core && yarn build && yarn dist",
+    "docker": "yarn fullbuild && cp -R ./dist /output",
     "MLPreBuildScript": "./prebuild.ts"
   },
   "author": "",

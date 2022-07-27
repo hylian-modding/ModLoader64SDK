@@ -14,4 +14,4 @@ COPY . .
 
 RUN git submodule update --init --recursive
 
-CMD ["yarn", "fullbuild"]
+CMD ["yarn", "docker"]
