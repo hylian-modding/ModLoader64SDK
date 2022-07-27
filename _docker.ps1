@@ -1,0 +1,1 @@
+docker run --rm -it -v ${PWD}:/output $(docker build -t modloader64/modloader64-sdk:3.0.0 -q .)
