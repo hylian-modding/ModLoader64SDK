@@ -42,6 +42,7 @@ class Project {
                         if (this.clean[0]) e += "c";
                         e += "b";
                         if (this.dist[0]) e += "d";
+                        StatusLog.reset();
                         this.child = child_process.exec(`modloader64 -${e}`);
                         this.child.stdout!.on('data', (d: any) => {
                             StatusLog.add(d.toString());
@@ -52,11 +53,13 @@ class Project {
                         process.chdir(og);
                     }
                     ImGui.sliderNumber(`Clients###${path.parse(this.dir).name}_Clients`, this.num, 1, 10, '%.0f');
-                    if (ImGui.smallButton("Launch mod")){
+                    if (ImGui.smallButton("Launch mod")) {
+                        process.chdir(this.dir);
                         this.child = child_process.exec(`modloader64 -r ${this.num[0]}`);
                         this.child.on('exit', (code: number) => {
                             this.child = undefined;
                         });
+                        process.chdir(og);
                     }
                 } else {
                     ImGui.text("Running please wait...");
@@ -73,6 +76,11 @@ class StatusLog {
 
     static lines: string[] = [""];
     static cur: ImGui.numberRef = [0];
+
+    static reset() {
+        this.lines = [""];
+        this.cur = [0];
+    }
 
     static add(str: string) {
         this.lines.push(str);
@@ -146,7 +154,7 @@ export default class GUI extends Application {
     }
 }
 
-if (!fs.existsSync("./userSettings.json")){
+if (!fs.existsSync("./userSettings.json")) {
     fs.writeFileSync("./userSettings.json", template);
 }
 
