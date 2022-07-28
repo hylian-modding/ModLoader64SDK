@@ -318,9 +318,13 @@ const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}
 function run(numOfInstances: number) {
     for (let i = 0; i < numOfInstances; i++) {
         if (i > 0) {
-            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
+            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
+                fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
+            }
         } else {
-            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
+            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`)){
+                fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
+            }
         }
         setTimeout(() => {
             let args: string[] = [];
