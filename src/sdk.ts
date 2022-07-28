@@ -318,16 +318,16 @@ const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}
 function run(numOfInstances: number) {
     for (let i = 0; i < numOfInstances; i++) {
         if (i > 0) {
-            fs.writeFileSync(path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
+            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
         } else {
-            fs.writeFileSync(path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
+            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
         }
         setTimeout(() => {
             let args: string[] = [];
             for (let i = 0; i < ML_ARGS.length; i++) {
                 args.push(ML_ARGS[i]);
             }
-            args.push(`--config "${path.resolve(sdk, "client", `ModLoader64-config-player${i + 1}.json`)}"`);
+            args.push(`--config "${path.resolve(og, `ModLoader64-config-player${i + 1}.json`)}"`);
             console.log(`Starting client with args: ${process.execPath} ${args.join(" ")}`);
             ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, detached: true, cwd: path.resolve(sdk, "client") })));
         }, i * 1000);
