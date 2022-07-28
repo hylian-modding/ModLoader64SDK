@@ -100,11 +100,31 @@ class Config {
     openProjects: string[] = [];
 }
 
+export interface ISDKConfig {
+    rom_directory: string;
+}
+
+export class SDKConfig implements ISDKConfig {
+
+    rom_directory: string;
+
+    constructor(rom_directory: string) {
+        this.rom_directory = rom_directory;
+    }
+}
+
 let config: Config = new Config();
 let config_file: string = path.resolve(og, "SDK-GUI-Config.json");
 if (fs.existsSync(config_file)) {
     config = JSON.parse(fs.readFileSync(config_file).toString());
 }
+
+let sdk_config: ISDKConfig = new SDKConfig(path.resolve(sdk, "roms"));
+let sdk_config_file: string = path.resolve(sdk, "SDK-Config.json");
+if (!fs.existsSync(sdk_config_file)) {
+    fs.writeFileSync(sdk_config_file, JSON.stringify(config, null, 2));
+}
+sdk_config = JSON.parse(fs.readFileSync(sdk_config_file).toString());
 
 export default class GUI extends Application {
 
@@ -130,7 +150,7 @@ export default class GUI extends Application {
     onNewFrame(): void {
         if (ImGui.beginMainMenuBar()) {
             if (ImGui.beginMenu("File")) {
-                if (ImGui.menuItem("Open")) {
+                if (ImGui.menuItem("Open Project")) {
                     let r = Gui.getExistingDirectory();
                     if (r !== undefined) {
                         if (config.openProjects.indexOf(r) > -1) return;
@@ -140,6 +160,31 @@ export default class GUI extends Application {
                         this.openProjects.push(p);
                         config.openProjects.push(r);
                         fs.writeFileSync(config_file, JSON.stringify(config));
+                    }
+                }
+                if (ImGui.menuItem("Create new project")) {
+                    let r = Gui.getExistingDirectory();
+                    if (r !== undefined) {
+                        if (config.openProjects.indexOf(r) > -1) return;
+                        process.chdir(r);
+                        child_process.execSync("modloader64 -n");
+                        let m = path.resolve(r, "package.json");
+                        let a = JSON.parse(fs.readFileSync(m).toString());
+                        let p = new Project(r, a);
+                        this.openProjects.push(p);
+                        config.openProjects.push(r);
+                        fs.writeFileSync(config_file, JSON.stringify(config));
+                        process.chdir(og);
+                    }
+                }
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("Settings")) {
+                if (ImGui.menuItem("Change rom directory")) {
+                    let r = Gui.getExistingDirectory();
+                    if (r !== undefined) {
+                        sdk_config.rom_directory = r;
+                        fs.writeFileSync(sdk_config_file, JSON.stringify(sdk_config));
                     }
                 }
                 ImGui.endMenu();
