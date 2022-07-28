@@ -1,0 +1,13 @@
+diff --git a/node_modules/uprocess/uprocess.js b/node_modules/uprocess/uprocess.js
+index 7baf7b8..8f4af36 100644
+--- a/node_modules/uprocess/uprocess.js
++++ b/node_modules/uprocess/uprocess.js
+@@ -222,7 +222,7 @@
+ 				// UNKNOWNCOMMAND
+ 				else if ( lines[lineNumber].match( expressions.UNKNOWNCOMMAND ) ) {
+ 					expvalue = lines[lineNumber].match( expressions.UNKNOWNCOMMAND )[1];
+-					console.warn( 'Unknown command #' + expvalue + " found " + errorLocation( originalLineNumber, includeDir, fileName ) );
++					//console.warn( 'Unknown command #' + expvalue + " found " + errorLocation( originalLineNumber, includeDir, fileName ) );
+ 				}
+ 
+ 			}

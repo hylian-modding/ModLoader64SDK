@@ -3,6 +3,7 @@ import { getAllFiles } from "./getAllFiles";
 import fs from 'fs-extra';
 import path from 'path';
 import { slash } from "./PakFormat";
+import preprocessor from "./preprocessor";
 
 function compile(fileNames: string[], options: ts.CompilerOptions): void {
     let program = ts.createProgram(fileNames, options);
@@ -21,6 +22,15 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
             console.log(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
         }
     });
+
+    try {
+        let files = getAllFiles(options.outDir!, [], ".js");
+        files.forEach((file: string) => {
+            preprocessor.process(file);
+        });
+    } catch (err: any) {
+        console.error(err);
+    }
 }
 
 function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
@@ -126,7 +136,7 @@ export class SDKCompiler {
     }
 }
 
-export interface ISDKCompiler{
+export interface ISDKCompiler {
     doBuild(dir: string);
     doBuildSingle(f: string): string;
     doCopy(dir: string);
