@@ -5,7 +5,7 @@ import path from 'path';
 import { slash } from "./PakFormat";
 import preprocessor from "./preprocessor";
 
-function compile(fileNames: string[], options: ts.CompilerOptions): void {
+function compile(fileNames: string[], options: ts.CompilerOptions, preproc: boolean = true): void {
     let program = ts.createProgram(fileNames, options);
     let emitResult = program.emit();
 
@@ -23,13 +23,15 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
         }
     });
 
-    try {
-        let files = getAllFiles(options.outDir!, [], ".js");
-        files.forEach((file: string) => {
-            preprocessor.process(file);
-        });
-    } catch (err: any) {
-        console.error(err);
+    if (preproc) {
+        try {
+            let files = getAllFiles(options.outDir!, [], ".js");
+            files.forEach((file: string) => {
+                preprocessor.process(file);
+            });
+        } catch (err: any) {
+            console.error(err);
+        }
     }
 }
 
@@ -108,7 +110,7 @@ export function doBuildSingle(f: string) {
         outDir: build,
         rootDir: src,
         esModuleInterop: true
-    });
+    }, false);
     return path.resolve(path.parse(f).dir, `${path.parse(f).name}.js`);
 }
 

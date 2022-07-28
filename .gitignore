@@ -140,3 +140,10 @@ modrecompiler.exe
 tools/updater/updater-linux
 tools/updater/updater-win.exe
 updater.exe
+imgui.ini
+modloader64-sdk-gui.exe
+SDK-GUI-Config.json
+tools/gui/modloader64-sdk-gui-linux
+tools/gui/modloader64-sdk-gui-win.exe
+tools/gui/userSettings.json
+userSettings.json
