@@ -16,6 +16,28 @@ let sdk: string = path.resolve(path.parse(process.execPath).dir);
 
 const bus: EventEmitter = new EventEmitter();
 
+interface ClientConfig {
+    ModLoader64: { rom: string; }
+}
+
+function getRomFromClientConfig(p: string) {
+    let m: ClientConfig = JSON.parse(fs.readFileSync(p).toString());
+    return path.parse(m.ModLoader64.rom).name;
+}
+
+function changeRomInClientConfig(d: string, rom: string) {
+    fs.readdirSync(d).forEach((f: string) => {
+        let file = path.resolve(d, f);
+        if (fs.lstatSync(file).isDirectory()) return;
+        if (path.parse(file).ext !== ".json") return;
+        if (file.indexOf("ModLoader64-config") > -1) {
+            let c: ClientConfig = JSON.parse(fs.readFileSync(file).toString());
+            c.ModLoader64.rom = rom;
+            fs.writeFileSync(file, JSON.stringify(c, null, 2));
+        }
+    });
+}
+
 class Project {
     dir: string;
     meta: any;
@@ -23,7 +45,7 @@ class Project {
     dist: ImGui.boolRef = [false];
     child: ChildProcess | undefined;
     open: ImGui.boolRef = [true];
-    num: ImGui.numberRef = [1];
+    num: ImGui.numberRef = [0];
 
     constructor(dir: string, meta: any) {
         this.dir = dir;
@@ -33,8 +55,16 @@ class Project {
     draw() {
         if (this.open[0]) {
             if (ImGui.begin(this.meta.name, this.open, ImGui.WindowFlags.NoCollapse)) {
-                ImGui.checkbox("Clean workspace", this.clean)
-                ImGui.checkbox("Make pak", this.dist)
+                ImGui.checkbox("Clean workspace", this.clean);
+                ImGui.sameLine();
+                ImGui.checkbox("Make pak", this.dist);
+                if (ImGui.smallButton("Set rom")) {
+                    let r = Gui.getOpenFileName({ currentFolder: sdk_config.rom_directory });
+                    console.log(r);
+                    if (r.filename !== undefined) {
+                        changeRomInClientConfig(this.dir, path.parse(r.filename).base);
+                    }
+                }
                 if (this.child === undefined) {
                     if (ImGui.smallButton("Build Mod")) {
                         process.chdir(this.dir);
@@ -132,12 +162,16 @@ export default class GUI extends Application {
     status: StatusLog = new StatusLog();
 
     onInit(): void {
-        config.openProjects.forEach((r: string) => {
-            let m = path.resolve(r, "package.json");
-            let a = JSON.parse(fs.readFileSync(m).toString());
-            let p = new Project(r!, a);
-            this.openProjects.push(p);
-        });
+        try {
+            config.openProjects.forEach((r: string) => {
+                let m = path.resolve(r, "package.json");
+                let a = JSON.parse(fs.readFileSync(m).toString());
+                let p = new Project(r!, a);
+                this.openProjects.push(p);
+            });
+        } catch (err: any) {
+            if (err) console.error(err);
+        }
         bus.on('removeProject', (proj: Project) => {
             let i = this.openProjects.indexOf(proj);
             this.openProjects.splice(i, 1);
@@ -193,7 +227,11 @@ export default class GUI extends Application {
         ImGui.endMainMenuBar();
 
         for (let i = 0; i < this.openProjects.length; i++) {
-            this.openProjects[i].draw();
+            try {
+                this.openProjects[i].draw();
+            } catch (err: any) {
+                if (err) console.error(err);
+            }
         }
         this.status.draw();
     }
