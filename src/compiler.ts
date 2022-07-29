@@ -119,7 +119,7 @@ export function doBuildSingle(f: string) {
 export function doCopy(dir: string) {
     let src = path.resolve(dir, "src");
     let build = path.resolve(dir, "build");
-    fs.copySync(src, build, { recursive: true });
+    fs.copySync(src, build, { recursive: true, filter: (src: string, dest: string) => { return src.indexOf(".asar") === -1 } });
     let core = path.resolve(dir, "cores");
     if (fs.existsSync(core)) {
         fs.copySync(core, build, { recursive: true });
