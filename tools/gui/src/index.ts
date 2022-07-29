@@ -45,7 +45,7 @@ class Project {
     dist: ImGui.boolRef = [false];
     child: ChildProcess | undefined;
     open: ImGui.boolRef = [true];
-    num: ImGui.numberRef = [0];
+    num: ImGui.numberRef = [1];
 
     constructor(dir: string, meta: any) {
         this.dir = dir;
