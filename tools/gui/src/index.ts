@@ -165,6 +165,7 @@ export default class GUI extends Application {
         try {
             config.openProjects.forEach((r: string) => {
                 let m = path.resolve(r, "package.json");
+                if (!fs.existsSync(m)) return;
                 let a = JSON.parse(fs.readFileSync(m).toString());
                 let p = new Project(r!, a);
                 this.openProjects.push(p);
