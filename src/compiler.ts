@@ -6,6 +6,18 @@ import { slash } from "./PakFormat";
 import preprocessor from "./preprocessor";
 
 function compile(fileNames: string[], options: ts.CompilerOptions, preproc: boolean = true): void {
+
+    if (preproc) {
+        try {
+            let files = getAllFiles(options.outDir!, [], ".ts");
+            files.forEach((file: string) => {
+                preprocessor.process(file);
+            });
+        } catch (err: any) {
+            console.error(err);
+        }
+    }
+
     let program = ts.createProgram(fileNames, options);
     let emitResult = program.emit();
 
@@ -22,17 +34,6 @@ function compile(fileNames: string[], options: ts.CompilerOptions, preproc: bool
             console.log(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
         }
     });
-
-    if (preproc) {
-        try {
-            let files = getAllFiles(options.outDir!, [], ".js");
-            files.forEach((file: string) => {
-                preprocessor.process(file);
-            });
-        } catch (err: any) {
-            console.error(err);
-        }
-    }
 }
 
 function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
@@ -57,7 +58,7 @@ function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
 
 export function doBuild(dir: string) {
     let meta: Record<string, string> = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
-    let src = path.resolve(dir, "src");
+    let src = path.resolve(dir, "build");
     let build = path.resolve(dir, "build");
     if (!fs.existsSync(build)) {
         fs.mkdirSync(build);
@@ -78,26 +79,6 @@ export function doBuild(dir: string) {
         sourceMap: true,
         paths: map,
     });
-    let core = path.resolve(dir, "cores");
-    if (fs.existsSync(core)) {
-        let map: Record<string, string[]> = {};
-        map[`@${meta.name}/*`] = ["./" + slash(path.relative(dir, path.resolve(core, meta.name))) + "/*"];
-        console.log(map);
-        compile(getAllFilesNoModules(core, [], ".ts"), {
-            noEmitOnError: true,
-            noImplicitAny: false,
-            target: ts.ScriptTarget.ESNext,
-            module: ts.ModuleKind.CommonJS,
-            experimentalDecorators: true,
-            outDir: build,
-            rootDir: core,
-            esModuleInterop: true,
-            declaration: true,
-            declarationMap: true,
-            sourceMap: true,
-            paths: map
-        });
-    }
 }
 
 export function doBuildSingle(f: string) {

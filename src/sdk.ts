@@ -222,8 +222,8 @@ function build() {
             child_process.fork(s, { stdio: 'inherit' });
         }
     }
-    doBuild(og);
     doCopy(og);
+    doBuild(og);
     if (meta.hasOwnProperty("scripts")) {
         if (meta.scripts.hasOwnProperty("MLBuildScript")) {
             let s = meta.scripts.MLBuildScript;
@@ -296,8 +296,8 @@ function install(skipClone: boolean = false, url: string = "") {
         }
         if (!skipClone) {
             init(dir);
-            doBuild(dir);
             doCopy(dir);
+            doBuild(dir);
         }
         let folders = getAllFolders(path.resolve(dir, "build"), []);
         while (folders.length > 1) {
