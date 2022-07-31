@@ -5,13 +5,13 @@ import path from 'path';
 import { slash } from "./PakFormat";
 import preprocessor from "./preprocessor";
 
-function compile(fileNames: string[], options: ts.CompilerOptions, preproc: boolean = true): void {
+function compile(fileNames: string[], options: ts.CompilerOptions, preproc: boolean = true, preproc_flags: string[] = []): void {
 
     if (preproc) {
         try {
             let files = getAllFiles(options.outDir!, [], ".ts");
             files.forEach((file: string) => {
-                preprocessor.process(file);
+                preprocessor.process(file, preproc_flags);
             });
         } catch (err: any) {
             console.error(err);
@@ -56,7 +56,7 @@ function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
     return files;
 }
 
-export function doBuild(dir: string) {
+export function doBuild(dir: string, preproc_flags: string[] = []) {
     let meta: Record<string, string> = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
     let src = path.resolve(dir, "build");
     let build = path.resolve(dir, "build");
@@ -78,7 +78,7 @@ export function doBuild(dir: string) {
         declarationMap: true,
         sourceMap: true,
         paths: map,
-    });
+    }, true, preproc_flags);
 }
 
 export function doBuildSingle(f: string) {

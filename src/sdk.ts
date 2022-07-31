@@ -53,6 +53,7 @@ program.option('-b, --build', 'build mod');
 program.option('-d, --dist', 'pack mod');
 program.option(`-i, --install <url>`, 'install core');
 program.option('-r, --run <num>', 'run mod');
+program.option('-f, --flags <flags>', 'compiler flags');
 
 program.allowUnknownOption(true);
 program.parse(process.argv);
@@ -66,6 +67,7 @@ interface Opts {
     dist?: boolean;
     install?: boolean;
     run?: boolean;
+    flags?: boolean;
 }
 
 class Tools {
@@ -223,7 +225,11 @@ function build() {
         }
     }
     doCopy(og);
-    doBuild(og);
+    let flags: string[] = [];
+    if (options.flags !== undefined) {
+        flags = options.flags.toString().split(",");
+    }
+    doBuild(og, flags);
     if (meta.hasOwnProperty("scripts")) {
         if (meta.scripts.hasOwnProperty("MLBuildScript")) {
             let s = meta.scripts.MLBuildScript;
@@ -313,16 +319,16 @@ function install(skipClone: boolean = false, url: string = "") {
     }
 }
 
-const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}"`, `--cores "${path.resolve(sdk, "client", "cores")}"`, `--mods "${path.resolve(og, "build")}"`];
+const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}"`, `--cores "${path.resolve(sdk, "client", "cores")}"`, `--mods "${path.resolve(og, "build")}"`, `--startdir "${og}"`];
 
 function run(numOfInstances: number) {
     for (let i = 0; i < numOfInstances; i++) {
         if (i > 0) {
-            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))){
+            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
                 fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
             }
         } else {
-            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))){
+            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
                 fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
             }
         }
