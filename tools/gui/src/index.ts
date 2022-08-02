@@ -65,6 +65,17 @@ class Project {
                         changeRomInClientConfig(this.dir, path.parse(r.filename).base);
                     }
                 }
+                if (ImGui.smallButton("Open in VSCode")) {
+                    child_process.exec(`code "${this.dir}"`);
+                }
+                if (process.platform === 'win32') {
+                    ImGui.sameLine();
+                    if (ImGui.smallButton("Open in Explorer")) {
+                        process.chdir(this.dir);
+                        child_process.exec(`start .`);
+                        process.chdir(og);
+                    }
+                }
                 if (this.child === undefined) {
                     if (ImGui.smallButton("Build Mod")) {
                         process.chdir(this.dir);
