@@ -68,13 +68,9 @@ class Project {
                 if (ImGui.smallButton("Open in VSCode")) {
                     child_process.exec(`code "${this.dir}"`);
                 }
-                if (process.platform === 'win32') {
-                    ImGui.sameLine();
-                    if (ImGui.smallButton("Open in Explorer")) {
-                        process.chdir(this.dir);
-                        child_process.exec(`start .`);
-                        process.chdir(og);
-                    }
+                ImGui.sameLine();
+                if (ImGui.smallButton("Open in Explorer")) {
+                    Gui.openUrl(this.dir);
                 }
                 if (this.child === undefined) {
                     if (ImGui.smallButton("Build Mod")) {
