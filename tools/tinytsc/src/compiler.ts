@@ -58,9 +58,6 @@ export function doBuild(dir: string) {
         outDir: build,
         rootDir: src,
         esModuleInterop: true,
-        declaration: true,
-        declarationMap: true,
-        sourceMap: true,
         paths: map,
     });
 }

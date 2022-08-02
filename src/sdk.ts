@@ -333,7 +333,7 @@ function run(numOfInstances: number) {
             }
         }
         setTimeout(() => {
-            let args: string[] = [];
+            let args: string[] = [`--windowTitle Player_${i + 1}`];
             for (let i = 0; i < ML_ARGS.length; i++) {
                 args.push(ML_ARGS[i]);
             }

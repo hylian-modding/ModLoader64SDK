@@ -40,9 +40,7 @@ function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
     getAllFiles(dir, files, ext);
     let r: string[] = [];
     for (let i = 0; i < files.length; i++) {
-        if (files[i].indexOf("node_modules") > -1) {
-            r.push(files[i]);
-        } else if (files[i].indexOf(".asar") > -1) {
+        if (files[i].indexOf("node_modules") > -1 || files[i].indexOf(".asar") > -1 || files[i].indexOf(".d.ts") > -1) {
             r.push(files[i]);
         }
     }
