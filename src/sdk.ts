@@ -327,6 +327,7 @@ function run(numOfInstances: number) {
             if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
                 fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
             }
+            
         } else {
             if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
                 fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));

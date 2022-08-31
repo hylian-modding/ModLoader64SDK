@@ -41,6 +41,7 @@ function getAllFilesNoModules(dir: string, files: Array<string>, ext: string) {
     let r: string[] = [];
     for (let i = 0; i < files.length; i++) {
         if (files[i].indexOf("node_modules") > -1 || files[i].indexOf(".asar") > -1 || files[i].indexOf(".d.ts") > -1) {
+            if (files[i].indexOf("global.d.ts") > -1) continue;
             r.push(files[i]);
         }
     }
