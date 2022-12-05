@@ -52,7 +52,7 @@ program.option("-c, --clean", "cleans build dirs");
 program.option('-b, --build', 'build mod');
 program.option('-d, --dist', 'pack mod');
 program.option(`-i, --install <url>`, 'install core');
-program.option('-r, --run <num>', 'run mod');
+program.option('-r, --run', 'run mod');
 program.option('-f, --flags <flags>', 'compiler flags');
 
 program.allowUnknownOption(true);
@@ -340,7 +340,7 @@ function run(numOfInstances: number) {
             }
             args.push(`--config "${path.resolve(og, `ModLoader64-config-player${i + 1}.json`)}"`);
             console.log(`Starting client with args: ${process.execPath} ${args.join(" ")}`);
-            ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, detached: true, cwd: path.resolve(sdk, "client") })));
+            ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, stdio: 'inherit', cwd: path.resolve(sdk, "client") })));
         }, i * 1000);
     }
 }
@@ -380,5 +380,5 @@ if (options.dist !== undefined) {
     ctx();
 }
 if (options.run !== undefined) {
-    run(parseInt(options.run.toString()));
+    run(1);
 }

@@ -64,6 +64,8 @@ export function doBuild(dir: string, preproc_flags: string[] = []) {
     }
     let map: Record<string, string[]> = {};
     map[`@${meta.name}/*`] = ["./" + slash(path.relative(dir, path.resolve(src, meta.name))) + "/*"];
+    let og = process.cwd();
+    process.chdir(dir);
     compile(getAllFilesNoModules(src, [], ".ts"), {
         noEmitOnError: true,
         noImplicitAny: false,
@@ -78,6 +80,7 @@ export function doBuild(dir: string, preproc_flags: string[] = []) {
         sourceMap: true,
         paths: map,
     }, true, preproc_flags);
+    process.chdir(og);
 }
 
 export function doBuildSingle(f: string) {
