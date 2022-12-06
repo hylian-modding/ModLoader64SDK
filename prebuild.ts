@@ -2,6 +2,10 @@ import fs from 'fs-extra';
 
 console.log("Ignore all the pkg warnings. They're nonsense.");
 
+if (fs.existsSync("./dist")){
+    fs.removeSync("./dist");
+}
+
 if (!fs.existsSync("./dist")) {
     fs.mkdirSync("./dist");
 }
