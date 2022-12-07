@@ -147,3 +147,5 @@ tools/gui/modloader64-sdk-gui-linux
 tools/gui/modloader64-sdk-gui-win.exe
 tools/gui/userSettings.json
 userSettings.json
+flips.exe
+flipscfg.bin
