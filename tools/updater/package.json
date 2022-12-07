@@ -6,9 +6,9 @@
   "scripts": {
     "build": "../../tinytsc",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./updater-win.exe ../../updater.exe",
+    "copy:test:win32": "copy updater-win.exe ..\\..\\updater.exe",
     "copy:nix": "chmod +x ./updater-linux && cp ./updater-linux ../../updater",
-    "dist": "cp ./updater-win.exe ../../dist/windows/updater.exe && cp ./updater-linux ../../dist/linux/updater",
+    "dist": "copy updater-win.exe ..\\..\\dist\\windows\\updater.exe && copy updater-linux ..\\..\\dist\\linux\\updater",
     "pkg": "pkg --compress GZip . && yarn copy",
     "postinstall": "yarn build && yarn pkg && yarn dist"
   },

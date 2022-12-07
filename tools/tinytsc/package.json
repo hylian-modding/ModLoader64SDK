@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./tinytsc-win.exe ../../tinytsc.exe",
+    "copy:test:win32": "copy tinytsc-win.exe ..\\..\\tinytsc.exe",
     "copy:nix": "chmod +x ./tinytsc-linux && cp ./tinytsc-linux ../../tinytsc",
     "dist": "cp ./tinytsc-win.exe ../../dist/windows/tinytsc.exe && cp ./tinytsc-linux ../../dist/linux/tinytsc",
     "pkg": "pkg --compress GZip . && yarn copy",

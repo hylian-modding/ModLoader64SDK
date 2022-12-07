@@ -6,9 +6,9 @@
   "scripts": {
     "build": "../../tinytsc",
     "copy": "run-script-os",
-    "copy:test:win32": "cp ./modloader64-sdk-gui-win.exe ../../modloader64-sdk-gui.exe",
+    "copy:test:win32": "copy modloader64-sdk-gui-win.exe ..\\..\\modloader64-sdk-gui.exe",
     "copy:nix": "chmod +x ./modloader64-sdk-gui-linux && cp ./modloader64-sdk-gui-linux ../../modloader64-sdk-gui",
-    "dist": "cp ./modloader64-sdk-gui-win.exe ../../dist/windows/modloader64-sdk-gui.exe && cp ./modloader64-sdk-gui-linux ../../dist/linux/modloader64-sdk-gui",
+    "dist": "copy modloader64-sdk-gui-win.exe ..\\..\\dist\\windows\\modloader64-sdk-gui.exe && copy .\\modloader64-sdk-gui-linux ..\\..\\dist\\linux\\modloader64-sdk-gui",
     "pkg": "pkg --compress GZip .",
     "postinstall": "yarn build && yarn pkg && yarn copy && yarn dist"
   },
