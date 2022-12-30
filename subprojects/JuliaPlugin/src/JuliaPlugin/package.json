@@ -1,0 +1,13 @@
+{
+  "name": "JuliaPlugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "JuliaPlugin.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {},
+  "core": "*"
+}

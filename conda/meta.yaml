@@ -1,0 +1,18 @@
+package:
+  name: modloader64-sdk
+  version: 3.0.0
+
+source:
+  fn: modloader64-sdk-win64.zip
+  url: ../dist/modloader64-sdk.zip
+
+build:
+  number: 0
+  binary_relocation: False
+  detect_binary_files_with_prefix: False
+  include_recipe: False
+
+about:
+  home: http://modloader64.com
+  license: GPL-3
+  summary: SDK for ModLoader64

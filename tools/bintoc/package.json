@@ -1,19 +1,15 @@
 {
-  "name": "tinytsc",
+  "name": "bintoc",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
-    "copy": "run-script-os",
-    "copy:test:win32": "copy tinytsc-win.exe ..\\..\\tinytsc.exe",
-    "copy:nix": "chmod +x ./tinytsc-linux && cp ./tinytsc-linux ../../tinytsc",
-    "dist": "cp ./tinytsc-win.exe ../../dist/windows/tinytsc.exe && cp ./tinytsc-linux ../../dist/linux/tinytsc",
-    "pkg": "pkg --compress GZip . && yarn copy",
+    "build": "tsc",
+    "pkg": "pkg --compress GZip .",
     "postinstall": "yarn build && yarn pkg"
   },
   "bin": {
-    "tinytsc": "./build/index.js"
+    "bintots": "./build/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -30,5 +26,6 @@
     "outputPath": "."
   },
   "dependencies": {
+    "recursive-readdir": "^2.2.2"
   }
 }

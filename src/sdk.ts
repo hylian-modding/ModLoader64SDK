@@ -25,7 +25,6 @@ class MLInstance {
     }
 }
 
-const ML_CORES: Map<string, string> = new Map();
 const ML_INSTANCES: MLInstance[] = [];
 
 function exitHandler() {
@@ -51,8 +50,7 @@ program.option('-n, --init', 'init new project');
 program.option("-c, --clean", "cleans build dirs");
 program.option('-b, --build', 'build mod');
 program.option('-d, --dist', 'pack mod');
-program.option(`-i, --install <url>`, 'install core');
-program.option('-r, --run', 'run mod');
+program.option('-r, --run <id>', 'run mod');
 program.option('-f, --flags <flags>', 'compiler flags');
 
 program.allowUnknownOption(true);
@@ -70,10 +68,6 @@ interface Opts {
     flags?: boolean;
 }
 
-class Tools {
-    static git: boolean = false;
-}
-
 let og: string = path.resolve(process.cwd());
 let sdk: string = path.resolve(path.parse(process.execPath).dir);
 
@@ -86,28 +80,7 @@ if (!fs.existsSync(config_file)) {
 }
 config = JSON.parse(fs.readFileSync(config_file).toString());
 
-if (fs.existsSync(path.resolve(sdk, "_cores"))) {
-    fs.readdirSync(path.resolve(sdk, "_cores")).forEach((f: string) => {
-        let dir = path.resolve(sdk, "_cores", f);
-        if (fs.lstatSync(dir).isDirectory() || fs.lstatSync(dir).isSymbolicLink()) {
-            let meta = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
-            ML_CORES.set(meta.name, dir);
-            console.log(`Detected installed core: ${meta.name}`);
-        }
-    });
-}
-
 const options: Opts = program.opts();
-
-function checkGit() {
-    try {
-        child_process.execSync("git --version", { stdio: 'pipe' })
-        Tools.git = true;
-        return true;
-    } catch (err) {
-    }
-    return false;
-}
 
 function makeSymlink(src: string, dest: string) {
     try {
@@ -140,7 +113,9 @@ try {
             hash = fs.readFileSync(path.resolve(client_folder, "client.md5"));
         }
         if (!md5.equals(hash)) {
-            backups.set(mupen_config, fs.readFileSync(mupen_config));
+            if (fs.existsSync(mupen_config)){
+                backups.set(mupen_config, fs.readFileSync(mupen_config));
+            }
             overwrite = true;
         }
     }
@@ -151,8 +126,6 @@ try {
         zip.extractAllTo(path.resolve(sdk));
         asar.extractAll(path.resolve(sdk, `${n}.asar`), client_folder);
         fs.removeSync(path.resolve(sdk, `${n}.asar`));
-        asar.extractAll(path.resolve(sdk, "client/node_modules.asar"), path.resolve(sdk, "client", "node_modules"));
-        fs.removeSync(path.resolve(sdk, "client/node_modules.asar"));
         fs.writeFileSync(path.resolve(client_folder, "client.md5"), md5);
         backups.forEach((value: Buffer, key: string) => {
             fs.writeFileSync(key, value);
@@ -160,7 +133,7 @@ try {
         fs.copyFileSync(process.execPath, path.resolve(client_folder, path.parse(process.execPath).base));
     }
 } catch (err) {
-    //if (err) console.error(err);
+    if (err) console.error(err);
 }
 
 function init(_dir: string) {
@@ -182,8 +155,12 @@ function init(_dir: string) {
             makeSymlink(d, d1);
         }
     });
-    ML_CORES.forEach((value: string, key: string) => {
-        install(true, value);
+    fs.readdirSync(path.resolve(sdk, "client/cores")).forEach((dir: string) => {
+        let d = path.resolve(sdk, "client/cores", dir);
+        let d1 = path.resolve(_dir, "node_modules", path.parse(d).base);
+        if (!fs.existsSync(d1)) {
+            makeSymlink(d, d1);
+        }
     });
     if (!fs.existsSync(path.resolve(_dir, "src"))) {
         fs.mkdirSync(path.resolve(_dir, "src"));
@@ -281,68 +258,30 @@ function dist() {
 }
 
 function install(skipClone: boolean = false, url: string = "") {
-    console.log(`git.... ${checkGit()}`);
-    let c = path.resolve(sdk, "_cores");
-    if (!fs.existsSync(c)) {
-        fs.mkdirSync(c);
-    }
-    if (url === "") url = options.install!.toString();
-    if (!Tools.git) {
-        console.error("You do not have git installed!");
-        throw new Error("You do not have git installed!");
-    } else {
-        let name = path.parse(url).name;
-        let dir = path.resolve(c, name);
-        if (!fs.existsSync(dir) && !skipClone) {
-            child_process.execSync(`git clone --recurse-submodules ${url} ${dir}`);
-        }
-        let meta = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json")).toString());
-        if (meta.name !== name) {
-            name = meta.name;
-        }
-        if (!skipClone) {
-            init(dir);
-            doCopy(dir);
-            doBuild(dir);
-        }
-        let folders = getAllFolders(path.resolve(dir, "build"), []);
-        while (folders.length > 1) {
-            folders.pop();
-        }
-        let folder = folders.pop()!;
-        let client_core_folder = path.resolve(sdk, "client", "cores");
-        if (!fs.existsSync(client_core_folder)) {
-            fs.mkdirSync(client_core_folder);
-        }
-        makeSymlink(folder, path.resolve(client_core_folder, name));
-        makeSymlink(folder, path.resolve(og, "node_modules", name));
-    }
 }
 
 const ML_ARGS: string[] = [`--forceclientmode`, `--roms "${config.rom_directory}"`, `--cores "${path.resolve(sdk, "client", "cores")}"`, `--mods "${path.resolve(og, "build")}"`, `--startdir "${og}"`];
 
-function run(numOfInstances: number) {
-    for (let i = 0; i < numOfInstances; i++) {
-        if (i > 0) {
-            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
-                fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
-            }
-            
-        } else {
-            if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`))) {
-                fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${i + 1}.json`), JSON.stringify(clientcfgtemplate, null, 2));
-            }
+function run(index: number) {
+    if (index > 0) {
+        if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${index}.json`))) {
+            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${index}.json`), JSON.stringify(clientcfgtemplate_nonhost, null, 2));
         }
-        setTimeout(() => {
-            let args: string[] = [`--windowTitle Player_${i + 1}`];
-            for (let i = 0; i < ML_ARGS.length; i++) {
-                args.push(ML_ARGS[i]);
-            }
-            args.push(`--config "${path.resolve(og, `ModLoader64-config-player${i + 1}.json`)}"`);
-            console.log(`Starting client with args: ${process.execPath} ${args.join(" ")}`);
-            ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, stdio: 'inherit', cwd: path.resolve(sdk, "client") })));
-        }, i * 1000);
+
+    } else {
+        if (!fs.existsSync(path.resolve(og, `ModLoader64-config-player${index}.json`))) {
+            fs.writeFileSync(path.resolve(og, `ModLoader64-config-player${index}.json`), JSON.stringify(clientcfgtemplate, null, 2));
+        }
     }
+    setTimeout(() => {
+        let args: string[] = [`--windowTitle Player_${index}`];
+        for (let i = 0; i < ML_ARGS.length; i++) {
+            args.push(ML_ARGS[i]);
+        }
+        args.push(`--config "${path.resolve(og, `ModLoader64-config-player${index}.json`)}"`);
+        console.log(`Starting client with args: ${process.execPath} ${args.join(" ")}`);
+        ML_INSTANCES.push(new MLInstance(child_process.spawn(path.resolve(sdk, "client", path.parse(process.execPath).base), args, { shell: true, stdio: 'inherit', cwd: path.resolve(sdk, "client") })));
+    }, index * 1000);
 }
 
 if (options.init !== undefined) {
@@ -380,5 +319,5 @@ if (options.dist !== undefined) {
     ctx();
 }
 if (options.run !== undefined) {
-    run(1);
+    run(parseInt(options.run as any));
 }

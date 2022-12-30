@@ -150,3 +150,9 @@ userSettings.json
 flips.exe
 flipscfg.bin
 bintots
+bintoc.exe
+ml64patch
+ml64patch.exe
+paker
+tools/bintoc/bintoc-linux
+tools/bintoc/bintoc-win.exe

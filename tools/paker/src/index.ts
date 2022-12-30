@@ -5,6 +5,7 @@ import { IPakFileCompressionOptions, Pak } from './PakFormat';
 import path from 'path';
 import zip from 'adm-zip';
 import fse from 'fs-extra';
+import asar from 'asar';
 
 let recursive = require('recursive-readdir');
 require('mkdir-recursive');
@@ -15,6 +16,7 @@ program.option('-o, --output <dir>', 'output dir');
 program.option("-j, --json <file>", "input json");
 program.option("-a, --algo <algo>", "compression algo");
 program.option("-c, --convert <zip>", "convert zip to pak");
+program.option("-s, --asar <pak>", "convert pak to asar");
 program.parse(process.argv);
 
 interface Opts {
@@ -24,6 +26,7 @@ interface Opts {
     input?: string;
     output?: string;
     algo?: string;
+    asar?: string;
 }
 
 const opts: Opts = program.opts();
@@ -38,6 +41,21 @@ if (opts.convert !== undefined) {
             pak.save_file(files[i], { enabled: true, algo: "DEFL" });
         }
         pak.update();
+    });
+}
+
+if (opts.asar !== undefined){
+    let pak: Pak = new Pak(opts.asar);
+    pak.extractAll("./");
+    let folder: string = ".";
+    fse.readdirSync(".").forEach((f: string)=>{
+        let f1 = path.resolve(".", f);
+        if (fse.lstatSync(f1).isDirectory()){
+            folder = f1;
+        }
+    });
+    asar.createPackage(folder, `./${path.parse(opts.asar).name}.asar`).then(()=>{
+        console.log("Conversion complete.");
     });
 }
 

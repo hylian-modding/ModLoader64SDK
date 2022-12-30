@@ -11,6 +11,7 @@ function compile(fileNames: string[], options: ts.CompilerOptions, preproc: bool
         try {
             let files = getAllFiles(options.outDir!, [], ".ts");
             files.forEach((file: string) => {
+                if (file.indexOf(".d.ts") > -1) return;
                 preprocessor.process(file, preproc_flags);
             });
         } catch (err: any) {
