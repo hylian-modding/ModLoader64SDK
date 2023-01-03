@@ -1,0 +1,18 @@
+package:
+  name: modloader64-sdk-condaplugin
+  version: 3.0.0
+
+source:
+  fn: CondaPlugin_conda.zip
+  url: ../dist/CondaPlugin_conda.zip
+
+build:
+  number: 0
+  binary_relocation: False
+  detect_binary_files_with_prefix: False
+  include_recipe: False
+
+about:
+  home: http://modloader64.com
+  license: GPL-3
+  summary: Conda package plugin for ML64 SDK

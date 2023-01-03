@@ -1,0 +1,33 @@
+{
+  "name": "version_number_extractor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "npx patch-package",
+    "build": "yarn && ts-node ./prebuild.ts && tsc && yarn pkg",
+    "dist": "mv ./version_number_extractor-win.exe ./dist/windows/version_number_extractor.exe && mv ./version_number_extractor-linux ./dist/linux/version_number_extractor && ts-node ./dist.ts",
+    "pkg": "pkg --compress GZip .",
+    "fullbuild": "yarn && yarn tools && yarn build && yarn dist",
+    "test": "tsc && node ./build/index.js"
+  },
+  "bin": {
+    "version_number_extractor": "./build/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "../../node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "targets": [
+      "node16-win-x64",
+      "node16-linux-x64"
+    ],
+    "outputPath": "."
+  },
+  "dependencies": {
+  }
+}

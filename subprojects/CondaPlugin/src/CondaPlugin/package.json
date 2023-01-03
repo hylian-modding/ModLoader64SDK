@@ -1,14 +1,15 @@
 {
-  "name": "AsarPlugin",
+  "name": "CondaPlugin",
   "version": "1.0.0",
   "description": "",
-  "main": "AsarPlugin.js",
+  "main": "CondaPlugin.js",
   "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "asar": "^3.2.0"
+    "@types/adm-zip": "^0.5.0",
+    "adm-zip": "^0.5.10"
   },
   "devDependencies": {},
   "core": "*"
