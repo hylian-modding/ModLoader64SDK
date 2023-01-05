@@ -1,6 +1,6 @@
 package:
   name: modloader64-sdk
-  version: 3.0.0
+  version: 3.0.1
 
 source:
   fn: modloader64-sdk-win64.zip
