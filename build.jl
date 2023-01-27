@@ -110,6 +110,7 @@ end
 
 # Build
 println("Building SDK...");
+runCommand("yarn");
 runCommand("tsc");
 println("Ignore all the pkg warnings. They're nonsense.");
 
