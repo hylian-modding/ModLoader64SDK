@@ -41,6 +41,7 @@ function hasTools()
 end
 
 function buildTool()
+    runCommand("yarn");
     runCommand("tsc");
     runCommand("pkg --compress GZip .");
 end
@@ -82,7 +83,7 @@ mkdir("./build");
 cp("./src", "./build", force=true);
 
 # Tool check
-if (!hasTools())
+#= if (!hasTools())
     println("Starting tool setup...");
 
     println("Building paker...");
@@ -96,7 +97,7 @@ if (!hasTools())
     println("Building linker...");
     cd(buildTool, "./tools/linker");
     copyTool("linker");
-end
+end =#
 
 # Check core
 if (isUpdateCore())
