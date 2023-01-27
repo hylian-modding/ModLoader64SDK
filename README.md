@@ -28,12 +28,17 @@ Options:
   In most cases you'll want to ``-n`` a new project, do some work, then ``-b`` to build it. ``-r 1`` will open the game with your mod loaded. Change the 1 to any number to open that many connected clients. Once you're done ``-d`` will package your mod up for sending it to others.
 
   # Building
-  To build the SDK yourself clone this repository with the recursive flag. From here you can use the provided ``dockerfile`` to build it with docker or build it manually.
+  To build the SDK yourself clone this repository with the recursive flag.
 
-Manual building:
+You will need:
+
+* [Nodejs](https://nodejs.org/en/)
+* [Julia](https://julialang.org/)
+
 1. npm install -g yarn
 2. npm install -g pkg
 3. npm install -g ts-node
 4. npm install -g asar
 5. yarn
-6. yarn fullbuild
+6. yarn core
+7. yarn build

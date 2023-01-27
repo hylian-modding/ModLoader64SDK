@@ -112,11 +112,7 @@ println("Building SDK...");
 runCommand("tsc");
 println("Ignore all the pkg warnings. They're nonsense.");
 
-if (isDist())
-    runCommand("pkg --compress GZip .");
-else
-    runCommand("pkg .");
-end
+runCommand("pkg --compress GZip .");
 
 if (Sys.iswindows())
     cp("./modloader64-win.exe", "./modloader64.exe", force=true);
